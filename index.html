@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sindhuja Penchala — Computer Vision Researcher</title>
+<meta name="description" content="Sindhuja Penchala is a PhD researcher at the University of Alabama building computer vision that understands how people behave.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EAEEF2; --surface:#F7F9FB; --ink:#142033; --muted:#566275; --line:#C9D1DB;
+  --box:#D92E66; --gaze:#16897B; --box-soft:rgba(217,46,102,.10); --gaze-soft:rgba(22,137,123,.12);
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --side:290px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#111A27; --surface:#18233A; --ink:#E6ECF3; --muted:#9AA7B9; --line:#2C3A52;
+    --box:#FF5E90; --gaze:#3CC4AF; --box-soft:rgba(255,94,144,.14); --gaze-soft:rgba(60,196,175,.14);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#111A27; --surface:#18233A; --ink:#E6ECF3; --muted:#9AA7B9; --line:#2C3A52;
+  --box:#FF5E90; --gaze:#3CC4AF; --box-soft:rgba(255,94,144,.14); --gaze-soft:rgba(60,196,175,.14);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth; scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:var(--body); font-size:1.0625rem; line-height:1.6; -webkit-font-smoothing:antialiased}
+img,svg{max-width:100%}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--box); outline-offset:3px; border-radius:4px}
+h1,h2,h3{font-family:var(--display); line-height:1.05; margin:0; font-weight:800; letter-spacing:-.02em}
+p{margin:0}
+
+/* ---------- Layout ---------- */
+.shell{display:grid; grid-template-columns:var(--side) minmax(0,1fr); gap:0; max-width:1440px; margin:0 auto}
+.side{position:sticky; top:env(safe-area-inset-top,0px); height:100vh; height:100dvh; padding:28px 22px 28px 28px}
+.side-card{height:100%; background:var(--surface); border:1px solid var(--line); border-radius:22px; padding:26px 22px; display:flex; flex-direction:column; gap:22px}
+main{min-width:0; padding:28px 40px 60px 32px}
+section{padding:96px 0 0}
+.wrap{max-width:980px}
+
+/* ---------- Sidebar ---------- */
+.avatar{position:relative; width:96px; height:96px; margin:6px 0 0 6px}
+.avatar .face{width:100%; height:100%; border-radius:50%; background:linear-gradient(140deg,var(--gaze) 0%, #2b5a9c 100%); display:grid; place-items:center; color:#fff; font-family:var(--display); font-weight:800; font-size:2rem; letter-spacing:-.02em; overflow:hidden}
+.avatar .face img{width:100%; height:100%; object-fit:cover}
+.avatar .bb{position:absolute; inset:-6px; border:1.5px solid var(--box); border-radius:4px}
+.avatar .bb span{position:absolute; top:-1.5px; left:-1.5px; transform:translateY(-100%); background:var(--box); color:#fff; font-size:.66rem; font-weight:600; padding:1px 6px; border-radius:3px 3px 0 0; white-space:nowrap}
+.side-name{font-family:var(--display); font-weight:800; font-size:1.45rem; line-height:1.1}
+.side-role{color:var(--muted); font-size:.92rem; margin-top:4px}
+.status{display:inline-flex; align-items:center; gap:8px; font-size:.82rem; background:var(--gaze-soft); color:var(--ink); padding:6px 11px; border-radius:999px; align-self:flex-start}
+.status i{width:8px; height:8px; border-radius:50%; background:var(--gaze); box-shadow:0 0 0 0 var(--gaze); animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--gaze) 60%,transparent)}70%{box-shadow:0 0 0 8px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.nav{display:flex; flex-direction:column; gap:2px; position:relative}
+.nav a{position:relative; z-index:1; text-decoration:none; padding:9px 12px; border-radius:10px; font-weight:500; font-size:.97rem; color:var(--muted); transition:color .25s}
+.nav a.active{color:var(--ink)}
+.nav .pill{position:absolute; left:0; right:0; height:40px; border-radius:10px; background:var(--paper); transition:transform .45s cubic-bezier(.2,.8,.2,1), height .3s; z-index:0}
+.side-links{margin-top:auto; display:flex; flex-direction:column; gap:8px}
+.btn{display:inline-flex; justify-content:center; align-items:center; gap:8px; font:600 .95rem var(--body); padding:11px 16px; border-radius:12px; border:1px solid var(--line); text-decoration:none; background:transparent; color:var(--ink); cursor:pointer; transition:background .25s, color .25s, border-color .25s, transform .2s}
+.btn:hover{border-color:var(--ink)}
+.btn:active{transform:scale(.98)}
+.btn.solid{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.btn.solid:hover{background:var(--box); border-color:var(--box); color:#fff}
+
+/* mobile top bar */
+.topbar{display:none}
+
+/* ---------- Hero ---------- */
+.hero{padding-top:34px; min-height:calc(100vh - 60px); min-height:calc(100dvh - 60px); display:flex; flex-direction:column; justify-content:center}
+.hero-hello{color:var(--muted); font-size:1.05rem; margin-bottom:18px}
+.name-stage{position:relative; display:inline-block; max-width:100%}
+.name{font-size:clamp(3.4rem, 10.5vw, 9.6rem); line-height:.88; letter-spacing:-.045em; font-weight:800}
+.name span{display:block}
+.name span:last-child{padding-left:.55em}
+.patches{position:absolute; inset:-10px -14px; display:grid; grid-template-columns:repeat(var(--cols,14),1fr); grid-template-rows:repeat(var(--rows,5),1fr); pointer-events:none}
+.patches div{background:var(--paper); border:1px solid color-mix(in srgb,var(--line) 70%,transparent); transition:opacity .5s ease, transform .5s ease}
+.patches div.gone{opacity:0; transform:scale(.6)}
+.patches div.seed{background:transparent; border:2px solid var(--box); position:relative; z-index:2}
+.patch-caption{position:absolute; font-size:.74rem; font-weight:600; color:#fff; background:var(--box); padding:2px 7px; border-radius:3px; white-space:nowrap; transition:opacity .4s; z-index:3}
+.hero-lede{max-width:34ch; font-size:clamp(1.2rem,2.1vw,1.55rem); line-height:1.35; margin-top:38px; font-family:var(--display); font-weight:400; letter-spacing:-.01em}
+.hero-meta{display:flex; flex-wrap:wrap; gap:10px 28px; margin-top:34px; color:var(--muted); font-size:.95rem}
+.hero-meta b{color:var(--ink); font-weight:600}
+.hero-cta{display:flex; gap:12px; margin-top:34px; flex-wrap:wrap}
+
+/* ---------- Section heads ---------- */
+.head{display:flex; justify-content:space-between; align-items:end; gap:24px; margin-bottom:40px; flex-wrap:wrap}
+.head h2{font-size:clamp(2.2rem,5vw,3.6rem)}
+.head p{color:var(--muted); max-width:46ch}
+
+/* ---------- Focus areas ---------- */
+.areas{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); border-top:1px solid var(--line)}
+.area{padding:30px 28px 32px 0; border-bottom:1px solid var(--line)}
+.area:nth-child(odd){border-right:1px solid var(--line)}
+.area:nth-child(even){padding-left:28px; padding-right:0}
+.area h3{font-size:1.5rem; margin-bottom:10px; font-weight:600}
+.area p{color:var(--muted); max-width:44ch}
+.area ul{list-style:none; padding:0; margin:16px 0 0; display:flex; flex-wrap:wrap; gap:6px}
+.area li{font-size:.82rem; padding:4px 10px; border:1px solid var(--line); border-radius:999px}
+
+/* ---------- About ---------- */
+.about{display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); gap:56px; align-items:start}
+.about-text p{font-size:1.15rem; line-height:1.65; max-width:58ch}
+.about-text p + p{margin-top:18px; color:var(--muted); font-size:1.05rem}
+.stats{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.stat{background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:22px 20px}
+.stat .n{font-family:var(--display); font-weight:800; font-size:clamp(2.2rem,4vw,3rem); line-height:1; letter-spacing:-.03em}
+.stat .l{color:var(--muted); font-size:.9rem; margin-top:8px}
+.stat:first-child{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.stat:first-child .l{color:color-mix(in srgb,var(--paper) 72%,transparent)}
+
+/* ---------- Projects ---------- */
+.projects{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px}
+.proj{position:relative; text-align:left; background:var(--surface); border:1px solid var(--line); border-radius:20px; padding:14px 14px 22px; cursor:pointer; font:inherit; color:inherit; transition:transform .35s cubic-bezier(.2,.8,.2,1), border-color .3s}
+.proj:hover{transform:translateY(-4px); border-color:var(--ink)}
+.proj.wide{grid-column:1/-1}
+.cover{position:relative; aspect-ratio:16/10; border-radius:12px; overflow:hidden; background:var(--paper)}
+.proj.wide .cover{aspect-ratio:21/8}
+.cover svg{position:absolute; inset:0; width:100%; height:100%}
+.cover .bbox{position:absolute; inset:14%; border:2px solid var(--box); border-radius:3px; opacity:0; transform:scale(1.12); transition:opacity .35s, transform .45s cubic-bezier(.2,.8,.2,1)}
+.cover .bbox span{position:absolute; left:-2px; top:-2px; transform:translateY(-100%); background:var(--box); color:#fff; font-size:.72rem; font-weight:600; padding:2px 7px; border-radius:3px 3px 0 0; white-space:nowrap}
+.proj:hover .bbox,.proj:focus-visible .bbox{opacity:1; transform:scale(1)}
+.proj .tag{display:inline-block; margin:18px 8px 0; font-size:.8rem; color:var(--gaze); font-weight:600}
+.proj h3{font-size:1.75rem; margin:6px 8px 0; font-weight:800}
+.proj p{margin:8px 8px 0; color:var(--muted); max-width:52ch}
+.proj .venue{margin:14px 8px 0; font-size:.88rem; font-weight:500}
+
+/* ---------- Modal ---------- */
+dialog{border:none; padding:0; background:transparent; max-width:min(860px,94vw); width:100%; color:var(--ink)}
+dialog::backdrop{background:rgba(10,16,26,.55); backdrop-filter:blur(4px); opacity:0; transition:opacity .3s}
+dialog[open]::backdrop{opacity:1}
+.sheet{background:var(--surface); border-radius:22px; border:1px solid var(--line); max-height:88vh; max-height:88dvh; overflow:auto; transform:translateY(24px) scale(.98); opacity:0; transition:transform .45s cubic-bezier(.2,.8,.2,1), opacity .3s}
+dialog.show .sheet{transform:none; opacity:1}
+.sheet .cover{border-radius:0; aspect-ratio:21/8}
+.sheet-body{padding:28px 32px 34px}
+.sheet-body .tag{color:var(--gaze); font-weight:600; font-size:.85rem}
+.sheet-body h3{font-size:clamp(1.9rem,4vw,2.6rem); margin:6px 0 4px}
+.sheet-body .sub{color:var(--muted); font-size:1.1rem}
+.sheet-grid{display:grid; grid-template-columns:1fr 1fr; gap:24px 36px; margin-top:28px}
+.sheet-grid h4{font-family:var(--display); font-size:1rem; margin:0 0 6px; font-weight:600}
+.sheet-grid p{color:var(--muted); font-size:.98rem}
+.facts{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px}
+.fact{border:1px solid var(--line); border-radius:12px; padding:10px 14px}
+.fact b{display:block; font-family:var(--display); font-size:1.35rem; line-height:1.1}
+.fact span{font-size:.8rem; color:var(--muted)}
+.close{position:sticky; top:14px; float:right; margin:14px 14px -54px 0; z-index:3; width:40px; height:40px; border-radius:50%; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:1.3rem; cursor:pointer; display:grid; place-items:center}
+.sheet-links{display:flex; gap:10px; margin-top:26px; flex-wrap:wrap}
+
+/* ---------- Publications ---------- */
+.filters{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px}
+.filters button{font:500 .9rem var(--body); padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--muted); cursor:pointer; transition:all .25s}
+.filters button[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink)}
+.pubs{list-style:none; padding:0; margin:0; border-top:1px solid var(--line)}
+.pub{display:grid; grid-template-columns:120px minmax(0,1fr) auto; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); align-items:baseline; transition:opacity .3s, transform .35s}
+.pub.hide{display:none}
+.pub.fade{opacity:0; transform:translateX(-8px)}
+.pub .yr{color:var(--muted); font-size:.9rem}
+.pub .t{font-weight:600; font-size:1.05rem; line-height:1.4}
+.pub .v{color:var(--muted); font-size:.92rem; margin-top:3px}
+.badge{font-size:.76rem; font-weight:600; padding:3px 9px; border-radius:999px; white-space:nowrap}
+.b-pub{background:var(--gaze-soft); color:var(--gaze)}
+.b-acc{background:var(--box-soft); color:var(--box)}
+.b-sub{border:1px solid var(--line); color:var(--muted)}
+.pub a{text-decoration-color:var(--box); text-underline-offset:3px}
+
+/* ---------- Experience ---------- */
+.timeline{position:relative; padding-left:34px}
+.timeline::before{content:""; position:absolute; left:7px; top:8px; bottom:8px; width:2px; background:var(--line)}
+.timeline .fill{position:absolute; left:7px; top:8px; width:2px; background:var(--box); height:0; transition:height .2s linear}
+.job{position:relative; padding-bottom:44px}
+.job::before{content:""; position:absolute; left:-34px; top:6px; width:16px; height:16px; border-radius:50%; background:var(--paper); border:2px solid var(--ink)}
+.job .when{color:var(--muted); font-size:.92rem}
+.job h3{font-size:1.55rem; margin-top:4px; font-weight:600}
+.job .org{font-weight:500; margin-top:2px}
+.job ul{margin:12px 0 0; padding-left:18px; color:var(--muted); max-width:66ch}
+.job li{margin:4px 0}
+.edu{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:12px}
+.edu div{border:1px solid var(--line); border-radius:16px; padding:18px; background:var(--surface)}
+.edu b{display:block; font-family:var(--display); font-size:1.15rem; line-height:1.2}
+.edu span{display:block; color:var(--muted); font-size:.9rem; margin-top:6px}
+
+/* ---------- Recognition & skills ---------- */
+.two{display:grid; grid-template-columns:1fr 1fr; gap:48px}
+.list{list-style:none; padding:0; margin:0}
+.list li{padding:14px 0; border-bottom:1px solid var(--line)}
+.list li b{display:block; font-weight:600}
+.list li span{color:var(--muted); font-size:.93rem}
+.skills dt{font-family:var(--display); font-weight:600; margin-top:18px}
+.skills dt:first-child{margin-top:0}
+.skills dd{margin:6px 0 0; display:flex; flex-wrap:wrap; gap:6px}
+.skills dd span{font-size:.85rem; border:1px solid var(--line); border-radius:8px; padding:4px 9px; background:var(--surface)}
+
+/* ---------- Contact ---------- */
+.contact{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:48px; background:var(--ink); color:var(--paper); border-radius:26px; padding:48px}
+.contact h2{font-size:clamp(2.4rem,5vw,3.8rem)}
+.contact p{color:color-mix(in srgb,var(--paper) 75%,transparent); margin-top:16px; max-width:40ch}
+.contact .ways{margin-top:30px; display:flex; flex-direction:column; gap:12px}
+.contact .ways a{text-decoration:none; font-size:1.05rem; border-bottom:1px solid color-mix(in srgb,var(--paper) 25%,transparent); padding-bottom:10px}
+.contact .ways a:hover{color:var(--gaze)}
+.contact .ways small{display:block; font-size:.8rem; color:color-mix(in srgb,var(--paper) 60%,transparent)}
+form{display:grid; gap:12px}
+label{font-size:.85rem; color:color-mix(in srgb,var(--paper) 70%,transparent); display:grid; gap:6px}
+input,select,textarea{font:inherit; font-size:1rem; color:var(--paper); background:color-mix(in srgb,var(--paper) 7%,transparent); border:1px solid color-mix(in srgb,var(--paper) 22%,transparent); border-radius:12px; padding:12px 14px; width:100%}
+select option{color:#142033}
+textarea{min-height:130px; resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none; border-color:var(--gaze)}
+.form-row{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.contact .btn.solid{background:var(--paper); color:var(--ink); border-color:var(--paper)}
+.contact .btn.solid:hover{background:var(--gaze); border-color:var(--gaze); color:#fff}
+.form-note{font-size:.85rem; min-height:1.2em; color:var(--gaze)}
+footer{padding:40px 0 10px; color:var(--muted); font-size:.88rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px}
+
+/* ---------- Reveal ---------- */
+.rv{opacity:0; transform:translateY(22px); transition:opacity .8s ease, transform .8s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1; transform:none}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1080px){
+  :root{--side:250px}
+  main{padding:24px 26px 50px 20px}
+  .about{grid-template-columns:1fr; gap:36px}
+}
+@media (max-width:860px){
+  .shell{display:block}
+  .side{display:none}
+  .topbar{display:flex; position:sticky; top:0; z-index:20; align-items:center; justify-content:space-between; gap:12px; padding:calc(12px + env(safe-area-inset-top,0px)) 18px 12px; margin-top:calc(-1 * env(safe-area-inset-top,0px)); background:color-mix(in srgb,var(--paper) 88%,transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+  .topbar .mini{display:flex; align-items:center; gap:10px; font-family:var(--display); font-weight:800; text-decoration:none}
+  .topbar .mini i{width:34px; height:34px; border-radius:50%; background:linear-gradient(140deg,var(--gaze),#2b5a9c); color:#fff; display:grid; place-items:center; font-style:normal; font-size:.85rem}
+  .menu-btn{border:1px solid var(--line); background:var(--surface); color:var(--ink); border-radius:10px; padding:8px 12px; font:600 .9rem var(--body)}
+  .drawer{position:fixed; inset:0; z-index:30; background:var(--paper); padding:calc(24px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:6px; transform:translateY(-100%); transition:transform .5s cubic-bezier(.2,.8,.2,1); visibility:hidden}
+  .drawer.open{transform:none; visibility:visible}
+  .drawer a{font-family:var(--display); font-weight:800; font-size:2.3rem; text-decoration:none; padding:6px 0}
+  .drawer .menu-btn{align-self:flex-end; margin-bottom:20px}
+  main{padding:10px 18px 40px}
+  section{padding-top:72px}
+  .hero{min-height:auto; padding-top:44px}
+  .areas,.projects,.two,.contact,.sheet-grid{grid-template-columns:1fr}
+  .area,.area:nth-child(even){padding:24px 0; border-right:none}
+  .area:nth-child(odd){border-right:none}
+  .proj.wide .cover{aspect-ratio:16/10}
+  .edu{grid-template-columns:1fr}
+  .pub{grid-template-columns:1fr; gap:6px}
+  .pub .badge{justify-self:start}
+  .contact{padding:30px 22px}
+  .form-row{grid-template-columns:1fr}
+  .sheet-body{padding:22px}
+}
+@media (min-width:861px){ .drawer{display:none} }
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important; transition:none!important; scroll-behavior:auto!important}
+  .rv{opacity:1; transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile top bar -->
+<header class="topbar">
+  <a class="mini" href="#home"><i>SP</i>Sindhuja</a>
+  <button class="menu-btn" id="openMenu" aria-expanded="false" aria-controls="drawer">Menu</button>
+</header>
+<nav class="drawer" id="drawer" aria-label="Mobile">
+  <button class="menu-btn" id="closeMenu">Close</button>
+  <a href="#home">Home</a><a href="#research">Research</a><a href="#work">Projects</a><a href="#publications">Publications</a><a href="#experience">Experience</a><a href="#contact">Contact</a>
+</nav>
+
+<div class="shell">
+  <!-- Sidebar -->
+  <aside class="side">
+    <div class="side-card">
+      <div class="avatar">
+        <div class="face" id="face">SP</div>
+        <div class="bb"><span>researcher 0.99</span></div>
+      </div>
+      <div>
+        <div class="side-name">Sindhuja Penchala</div>
+        <div class="side-role">PhD researcher in computer vision, University of Alabama</div>
+      </div>
+      <div class="status"><i></i>Speaking at ICMLA 2026</div>
+      <nav class="nav" id="nav" aria-label="Sections">
+        <div class="pill" id="pill"></div>
+        <a href="#home">Home</a>
+        <a href="#research">Research</a>
+        <a href="#work">Projects</a>
+        <a href="#publications">Publications</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="side-links">
+        <a class="btn solid" href="mailto:spenchala@crimson.ua.edu">Email me</a>
+        <a class="btn" href="https://linkedin.com/in/SindhujaPenchala" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn" href="https://github.com/SindhuPenchala" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="home">
+      <div class="wrap">
+        <p class="hero-hello">Hi, I'm</p>
+        <div class="name-stage" id="stage">
+          <h1 class="name"><span>Sindhuja</span><span>Penchala</span></h1>
+          <div class="patches" id="patches" aria-hidden="true"></div>
+        </div>
+        <p class="hero-lede">I build computer vision that reads how people behave: where children look, when they work together, and the seconds before things go wrong.</p>
+        <div class="hero-meta">
+          <span><b>PhD student</b> at the University of Alabama, BRAINS Lab</span>
+          <span><b>4 years</b> in enterprise security at TCS</span>
+        </div>
+        <div class="hero-cta">
+          <a class="btn solid" href="#work">See my research</a>
+          <a class="btn" href="#contact">Get in touch</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Research areas -->
+    <section id="research">
+      <div class="wrap">
+        <div class="head rv">
+          <h2>What I work on</h2>
+          <p>Four threads, one question: how can machines see enough of the world to act well in it?</p>
+        </div>
+        <div class="areas">
+          <div class="area rv">
+            <h3>Behavior and engagement</h3>
+            <p>Datasets and transformer models that recognize gaze, collaboration, and engagement in children, and early signs of aggression in video.</p>
+            <ul><li>ChildGaze</li><li>Learning in Focus</li><li>Pre-incident prediction</li></ul>
+          </div>
+          <div class="area rv">
+            <h3>Seeing from very little</h3>
+            <p>Reconstructing and classifying surfaces when only 10% of the image is visible, and fusing touch with vision.</p>
+            <ul><li>One Patch</li><li>SSUF</li><li>Surformer v2</li></ul>
+          </div>
+          <div class="area rv">
+            <h3>Safe AI and robots</h3>
+            <p>Zero-trust, multi-gate safety for language models, now extended to action-level checks for vision-language-action robots.</p>
+            <ul><li>Cognitive Firewall</li><li>Cognitive Autonomy</li><li>VLA action gates</li></ul>
+          </div>
+          <div class="area rv">
+            <h3>Security analytics</h3>
+            <p>Machine learning that ranks vulnerabilities by real-world exploit risk, grounded in four years of patching at enterprise scale.</p>
+            <ul><li>Beyond CVSS</li><li>WBTS model</li></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="about">
+      <div class="wrap about">
+        <div class="about-text rv">
+          <p>I'm a computer vision researcher at the University of Alabama's BRAINS Lab. My doctoral work starts from ChildGaze, a dataset of how children look and collaborate, and builds toward social robots that notice behavioral patterns over time and respond in the right way.</p>
+          <p>Before research, I spent four years at Tata Consultancy Services as a patching and vulnerability analyst, where I also served as backup lead and change coordinator. That work taught me to care about systems that hold up in the real world, and it still shapes how I evaluate models today.</p>
+        </div>
+        <div class="stats">
+          <div class="stat rv"><div class="n" data-count="12" data-suffix="+">0</div><div class="l">Papers published, accepted, or under review</div></div>
+          <div class="stat rv"><div class="n" data-count="13330" data-suffix="">0</div><div class="l">Child-frames annotated in ChildGaze</div></div>
+          <div class="stat rv"><div class="n" data-count="13000" data-suffix="+">0</div><div class="l">Servers patched at TCS</div></div>
+          <div class="stat rv"><div class="n" data-count="4.0" data-dec="1" data-suffix="">0</div><div class="l">GPA across MS and PhD</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="work">
+      <div class="wrap">
+        <div class="head rv">
+          <h2>Featured projects</h2>
+          <p>Select a project to see the problem, the approach, and what it found.</p>
+        </div>
+        <div class="projects" id="projects"></div>
+      </div>
+    </section>
+
+    <!-- Publications -->
+    <section id="publications">
+      <div class="wrap">
+        <div class="head rv">
+          <h2>Publications</h2>
+          <p>Peer-reviewed papers, accepted work, and manuscripts under review.</p>
+        </div>
+        <div class="filters rv" id="filters" role="group" aria-label="Filter publications">
+          <button aria-pressed="true" data-f="all">All</button>
+          <button aria-pressed="false" data-f="vision">Vision</button>
+          <button aria-pressed="false" data-f="safety">AI safety</button>
+          <button aria-pressed="false" data-f="security">Security</button>
+          <button aria-pressed="false" data-f="health">Health and text</button>
+        </div>
+        <ul class="pubs" id="pubs"></ul>
+      </div>
+    </section>
+
+    <!-- Experience -->
+    <section id="experience">
+      <div class="wrap">
+        <div class="head rv">
+          <h2>Experience</h2>
+          <p>From securing enterprise infrastructure to building perception models for robots.</p>
+        </div>
+        <div class="timeline" id="timeline">
+          <div class="fill" id="tlfill"></div>
+          <div class="job rv">
+            <div class="when">Aug 2025 to now</div>
+            <h3>Graduate Research Assistant</h3>
+            <div class="org">BRAINS Lab, The University of Alabama</div>
+            <ul>
+              <li>Build perception and learning models for intelligent, autonomous systems with CNNs and vision transformers (ViT, DeiT, Swin, MAE).</li>
+              <li>Created the ChildGaze dataset end to end: annotation protocol, Labelbox conversion tooling, a review GUI, and agreement analysis.</li>
+              <li>Run full pipelines in Python, PyTorch, and TensorFlow, from data collection to evaluation and publication figures.</li>
+            </ul>
+          </div>
+          <div class="job rv">
+            <div class="when">Aug 2023 to Dec 2024</div>
+            <h3>Graduate Research Assistant</h3>
+            <div class="org">Cyber Innovations Lab, University of Southern Mississippi</div>
+            <ul>
+              <li>Applied machine learning to security data, improving risk detection by 15%.</li>
+              <li>Researched emerging threats and vulnerability prioritization, leading to the WBTS model.</li>
+            </ul>
+          </div>
+          <div class="job rv">
+            <div class="when">Sep 2019 to Aug 2023</div>
+            <h3>System Engineer, Patching and Vulnerability Analyst</h3>
+            <div class="org">Tata Consultancy Services, Hyderabad</div>
+            <ul>
+              <li>Remediated 500+ critical vulnerabilities and deployed patches across 13,000+ servers with SCCM and WSUS.</li>
+              <li>Automated remediation tracking and reporting, cutting manual effort by 40%.</li>
+              <li>Customized ServiceNow ITSM modules (CMDB, Service Catalog, integrations) and served as backup lead and change coordinator.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="edu">
+          <div class="rv"><b>PhD, Computer Science</b><span>The University of Alabama<br>2025 to now, GPA 4.0</span></div>
+          <div class="rv"><b>MS, Computer Science</b><span>University of Southern Mississippi<br>2023 to 2024, GPA 4.0</span></div>
+          <div class="rv"><b>BTech, Computer Science</b><span>JNTUH College of Engineering<br>2015 to 2019</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recognition + skills -->
+    <section id="recognition">
+      <div class="wrap two">
+        <div class="rv">
+          <div class="head"><h2 style="font-size:clamp(1.9rem,3.6vw,2.6rem)">Recognition</h2></div>
+          <ul class="list">
+            <li><b>NextGen Scholar, IEEE BHI 2025</b><span>NSF, EMBS, and Google sponsored young professional recognition</span></li>
+            <li><b>Graduate Student Spotlight</b><span>Graduate School, University of Southern Mississippi</span></li>
+            <li><b>Student Travel Award</b><span>University of Southern Mississippi</span></li>
+            <li><b>Service and Commitment Award</b><span>Tata Consultancy Services, Xcelerate Warrior certificate</span></li>
+            <li><b>Top 10, EXCITE Program</b><span>JNTUH, for innovation and project execution</span></li>
+            <li><b>Telangana Startup Yatra</b><span>Represented JNTUH; also mentored a 36-hour hackathon</span></li>
+          </ul>
+        </div>
+        <div class="rv">
+          <div class="head"><h2 style="font-size:clamp(1.9rem,3.6vw,2.6rem)">Toolkit</h2></div>
+          <dl class="skills">
+            <dt>Models</dt><dd><span>ViT</span><span>DeiT</span><span>Swin</span><span>MAE</span><span>U-Net</span><span>Autoencoders</span><span>YOLO pose</span><span>LLM guardrails</span></dd>
+            <dt>Frameworks</dt><dd><span>PyTorch</span><span>TensorFlow</span><span>Keras</span><span>OpenCV</span><span>scikit-learn</span><span>Pandas</span><span>NumPy</span></dd>
+            <dt>Languages</dt><dd><span>Python</span><span>C</span><span>C++</span><span>SQL</span><span>LaTeX</span></dd>
+            <dt>Data and tools</dt><dd><span>Labelbox</span><span>Docker</span><span>Unity</span><span>AWS</span><span>Azure</span><span>Power BI</span><span>ServiceNow</span><span>SCCM</span></dd>
+            <dt>Certifications</dt><dd><span>CISSP</span><span>Azure</span><span>LLMs and Gen AI</span><span>Power BI</span></dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact">
+      <div class="wrap contact rv">
+        <div>
+          <h2>Let's work together</h2>
+          <p>I'm happy to talk about research collaborations, internships, datasets, or a talk at your lab.</p>
+          <div class="ways">
+            <a href="mailto:spenchala@crimson.ua.edu"><small>Email</small>spenchala@crimson.ua.edu</a>
+            <a href="tel:+16019131594"><small>Phone</small>+1 601 913 1594</a>
+            <a href="https://linkedin.com/in/SindhujaPenchala" target="_blank" rel="noopener"><small>LinkedIn</small>linkedin.com/in/SindhujaPenchala</a>
+            <a href="https://github.com/SindhuPenchala" target="_blank" rel="noopener"><small>GitHub</small>github.com/SindhuPenchala</a>
+          </div>
+        </div>
+        <form id="form" novalidate>
+          <div class="form-row">
+            <label>Name<input name="name" required autocomplete="name"></label>
+            <label>Email<input name="email" type="email" required autocomplete="email"></label>
+          </div>
+          <label>What's this about?
+            <select name="topic">
+              <option>Research collaboration</option>
+              <option>Internship or role</option>
+              <option>Invited talk</option>
+              <option>Something else</option>
+            </select>
+          </label>
+          <label>Message<textarea name="msg" required></textarea></label>
+          <button class="btn solid" type="submit">Open email draft</button>
+          <div class="form-note" id="note" role="status"></div>
+        </form>
+      </div>
+      <footer><span>© 2026 Sindhuja Penchala</span><span>Tuscaloosa, Alabama</span></footer>
+    </section>
+  </main>
+</div>
+
+<!-- Project dialog -->
+<dialog id="dlg" aria-labelledby="dlgTitle">
+  <div class="sheet" id="sheet"></div>
+</dialog>
+
+<script>
+/* ---------- Data ---------- */
+const PROJECTS = [
+  { id:"childgaze", wide:true, tag:"Dataset and benchmark", title:"ChildGaze", label:"child_face 0.892",
+    line:"A benchmark for seeing how children look, move, and collaborate together.",
+    venue:"arXiv 2609.06353, under review at IEEE BigData 2026",
+    problem:"Existing child-interaction datasets mostly show one child at a time, so models never learn what collaboration between children and adults looks like.",
+    approach:"Frame-level, per-person annotations on 27 clips from ChildPlay footage: face and head boxes, hand boxes, and collaboration labels, built with custom Labelbox conversion and review tools.",
+    result:"Annotations reach Cohen's kappa of 0.77 and 0.86 on validation subsets, with face box IoU near 0.89. ViT, DeiT, and Swin baselines are benchmarked on the task.",
+    next:"ChildGaze is the foundation of my dissertation: a social robot that understands behavioral and collaborative patterns over time.",
+    facts:[["13,330","child-frames"],["27","video clips"],["0.86","best Cohen's kappa"],["1080p","full resolution"]],
+    link:["Read on arXiv","https://arxiv.org/abs/2609.06353"] },
+  { id:"ssuf", tag:"Computer vision", title:"Seeing through extreme sparsity", label:"concrete 0.89",
+    line:"Recognizing and rebuilding a surface from a random 10% glimpse.",
+    venue:"Accepted, IEEE iAIMS 2026, Barcelona",
+    problem:"Robots often see only a sliver of the surface they touch. Can a model still tell grass from rock, and fill in what's missing?",
+    approach:"Four pretrained backbones (ResNet-50 autoencoder, ViT, Swin, MAE) adapted with classification heads and decoders, trained on a random contiguous 10% patch from Touch-and-Go.",
+    result:"Swin leads classification at 89.21% accuracy; MAE gives the best reconstruction at 16.06 dB PSNR. Every model runs under 5 ms per image.",
+    next:"Builds directly on One Patch, moving from a fixed center patch to a random one.",
+    facts:[["89.21%","Swin accuracy"],["16.06 dB","MAE PSNR"],["<5 ms","per image"],["10%","pixels visible"]] },
+  { id:"onepatch", tag:"Computer vision", title:"One Patch Is All You Need", label:"wood 0.85",
+    line:"Joint surface reconstruction and classification from a single center patch.",
+    venue:"Published, Sensors 2026, 26, 2083",
+    problem:"Surface understanding usually assumes the whole image. Real perception is often partial.",
+    approach:"SMARC: a partial-convolution U-Net with a multi-scale classification head, reconstructing the full surface from a 10% center patch, compared against ConvAE, ViT, MAE, Swin, and DETR.",
+    result:"85.10% classification accuracy with 17.55 dB PSNR reconstruction on four surface classes.",
+    next:"Extended in SSUF to random patch locations and pretrained transformer backbones.",
+    facts:[["85.10%","accuracy"],["17.55 dB","PSNR"],["2,921","images"],["4","surface classes"]] },
+  { id:"firewall", tag:"AI safety", title:"Cognitive Firewall", label:"intent: unsafe",
+    line:"Zero-trust gates that stop unsafe requests to language models before they land.",
+    venue:"ICMLA 2026, oral presentation (equal contribution)",
+    problem:"Single-pass guardrails miss attacks that unfold across a conversation or hide behind harmless context.",
+    approach:"A proactive framework with four gates (intent, zero-trust context, consistency, output risk) and an escalation rule, overseen by a local model.",
+    result:"Presented at ICMLA 2026. I'm now extending it to vision-language-action robots with two action-level gates that check intent-action consistency and action safety, using surgical instrument handover as the test case.",
+    next:"The robot extension asks whether misaligned plans can slip past the original four gates, and what the new gates cost in task success and latency.",
+    facts:[["4 to 6","safety gates"],["Zero-trust","by design"],["15 min","ICMLA talk"]] },
+  { id:"preincident", tag:"Behavior understanding", title:"Pre-incident prediction", label:"risk: medium",
+    line:"Reading the seconds before aggression, with the incident itself cut out.",
+    venue:"Manuscript in preparation",
+    problem:"Most violence detection reacts after the event. I want to know whether the build-up is visible at all.",
+    approach:"A new dataset of 236 clips cut from XD-Violence with four ordinal risk levels, where only the pre-incident window is kept. Facial appearance, audio, and pose-based body motion are tested alone and together across transformer backbones.",
+    result:"A two-stage design first separates normal from risky moments, then grades how risky they are.",
+    next:"Aimed at proactive safety: noticing escalation early enough for someone to step in.",
+    facts:[["236","curated clips"],["4","risk levels"],["3","cue types"]] },
+  { id:"cvss", tag:"Security analytics", title:"Beyond CVSS", label:"exploit: likely",
+    line:"Ranking vulnerabilities by the risk that someone actually exploits them.",
+    venue:"IEEE Access, in revision",
+    problem:"Severity scores alone don't tell a patching team what attackers will go after first.",
+    approach:"A WBTS priority score combined with text features from CVE descriptions, compared across logistic regression, random forest, SVM, XGBoost, and LightGBM on a heavily imbalanced set of 2,203 CVEs.",
+    result:"Evidence-based remediation guidance for OWASP vulnerabilities. The earlier WBTS model reached 96.7% accuracy in prioritization.",
+    next:"Grounded in four years of hands-on patching across 13,000+ servers.",
+    facts:[["2,203","CVEs"],["5","model families"],["96.7%","WBTS accuracy"]] }
+];
+
+const PUBS = [
+  {y:"2026", t:"ChildGaze: a benchmark dataset for child collaborative engagement", v:"arXiv 2609.06353; under review at IEEE BigData 2026", s:"sub", c:"vision", url:"https://arxiv.org/abs/2609.06353"},
+  {y:"2026", t:"Seeing Through Extreme Visual Sparsity: surface understanding from a random patch", v:"IEEE iAIMS 2026, Barcelona", s:"acc", c:"vision"},
+  {y:"2026", t:"One Patch Is All You Need: Joint Surface Material Reconstruction and Classification from Minimal Visual Cues", v:"Sensors 26, 2083", s:"pub", c:"vision"},
+  {y:"2026", t:"Cognitive Firewall: A Proactive, Zero-Trust, Multi-Gate Framework for LLM Safety", v:"ICMLA 2026", s:"acc", c:"safety"},
+  {y:"2026", t:"Pre-Incident Behavioral Prediction using Vision Transformers", v:"Manuscript in preparation", s:"sub", c:"vision"},
+  {y:"2025", t:"Beyond CVSS: An AI-Driven Framework for Evidence-Based OWASP Vulnerability Remediation", v:"IEEE Access", s:"sub", c:"security"},
+  {y:"2025", t:"Surformer v2: A Multimodal Classifier for Surface Understanding from Touch and Vision", v:"MDPI", s:"pub", c:"vision"},
+  {y:"2025", t:"Learning in Focus: Detecting Behavioral and Collaborative Engagement Using Vision Transformers", v:"ICICT", s:"pub", c:"vision"},
+  {y:"2025", t:"Bridging the Gap: Toward Cognitive Autonomy in Artificial Intelligence", v:"ICICT", s:"pub", c:"safety"},
+  {y:"2025", t:"Reforming Artificial Intelligence through Cognitive Containment", v:"ICICT", s:"pub", c:"safety"},
+  {y:"2025", t:"A Knowledge Graph for Geriatric Patient Journeys", v:"IEEE BHI", s:"pub", c:"health"},
+  {y:"2024", t:"Maximizing Cyber Resilience through Efficient Vulnerability Prioritization: The WBTS Model", v:"International Journal of Computer Applications", s:"pub", c:"security"},
+  {y:"2024", t:"Unveiling Text Mining Potential: A Comparative Analysis of Document Classification Algorithms", v:"EPiC Series", s:"pub", c:"health"}
+];
+const BADGE = {pub:["Published","b-pub"], acc:["Accepted","b-acc"], sub:["Under review","b-sub"]};
+
+/* ---------- Generative covers ---------- */
+function rng(seed){let s=seed;return()=>((s=Math.imul(48271,s)%2147483647)&2147483647)/2147483647}
+function cover(id){
+  const W=640,H=400, r=rng(id.length*977+7); let g="";
+  const ink="var(--ink)", box="var(--box)", gz="var(--gaze)", ln="var(--line)";
+  if(id==="childgaze"){
+    for(let i=0;i<40;i++) g+=`<circle cx="${r()*W}" cy="${r()*H}" r="${1+r()*2}" fill="${ln}"/>`;
+    const P=[[170,190,46,box],[330,160,40,gz],[470,205,44,box]];
+    P.forEach(([x,y,rad,c])=>{g+=`<line x1="${x}" y1="${y}" x2="320" y2="300" stroke="${c}" stroke-width="2" stroke-dasharray="6 6"/>`});
+    P.forEach(([x,y,rad,c])=>{g+=`<circle cx="${x}" cy="${y}" r="${rad}" fill="${ink}" opacity=".9"/><rect x="${x-rad-8}" y="${y-rad-8}" width="${(rad+8)*2}" height="${(rad+8)*2}" fill="none" stroke="${c}" stroke-width="2.5"/><path d="M${x-rad-20} ${y+rad+80} Q${x} ${y+rad+10} ${x+rad+20} ${y+rad+80}" fill="${ink}" opacity=".9"/>`});
+    g+=`<rect x="300" y="282" width="40" height="36" rx="6" fill="${gz}"/>`;
+  } else if(id==="ssuf"||id==="onepatch"){
+    const cols=16, rows=10, cw=W/cols, ch=H/rows;
+    const cx = id==="onepatch"?7:Math.floor(r()*10)+2, cy = id==="onepatch"?4:Math.floor(r()*5)+2;
+    for(let i=0;i<cols;i++)for(let j=0;j<rows;j++){
+      const on = Math.abs(i-cx)<=1.5 && Math.abs(j-cy)<=1;
+      if(on){ g+=`<rect x="${i*cw}" y="${j*ch}" width="${cw}" height="${ch}" fill="${ink}" opacity="${.55+r()*.45}"/>`;
+        for(let k=0;k<3;k++) g+=`<line x1="${i*cw}" y1="${j*ch+r()*ch}" x2="${i*cw+cw}" y2="${j*ch+r()*ch}" stroke="${id==='ssuf'?gz:box}" stroke-width="1.5" opacity=".8"/>`; }
+      else g+=`<rect x="${i*cw+2}" y="${j*ch+2}" width="${cw-4}" height="${ch-4}" rx="3" fill="none" stroke="${ln}" />`;
+    }
+    g+=`<rect x="${(cx-1.5)*cw}" y="${(cy-1)*ch}" width="${cw*4}" height="${ch*3}" fill="none" stroke="${box}" stroke-width="3"/>`;
+  } else if(id==="firewall"){
+    for(let i=0;i<6;i++){const x=110+i*84; const c=i>=4?box:ink; g+=`<rect x="${x}" y="70" width="22" height="260" rx="11" fill="${c}" opacity="${i>=4?1:.85}"/>`}
+    g+=`<path d="M30 200 C 90 140, 150 260, 210 200 S 330 140, 390 200 S 470 250, 500 200" fill="none" stroke="${gz}" stroke-width="4"/>`;
+    g+=`<circle cx="500" cy="200" r="10" fill="${gz}"/><path d="M560 170 l40 40 M600 170 l-40 40" stroke="${box}" stroke-width="5" stroke-linecap="round"/>`;
+  } else if(id==="preincident"){
+    let d="M0 "+H/2; for(let x=0;x<=W;x+=8){const amp=x<420?10+x/30:0; d+=` L${x} ${H/2+Math.sin(x/14)*amp*(0.6+r()*.8)}`}
+    g+=`<rect x="250" y="40" width="170" height="320" fill="var(--gaze-soft)" stroke="${gz}" stroke-width="2"/>`;
+    g+=`<rect x="440" y="40" width="200" height="320" fill="none" stroke="${box}" stroke-width="2" stroke-dasharray="8 8"/><path d="M470 70 L610 330 M610 70 L470 330" stroke="${box}" stroke-width="2" opacity=".5"/>`;
+    g+=`<path d="${d}" fill="none" stroke="${ink}" stroke-width="3"/>`;
+  } else {
+    for(let i=0;i<140;i++){const x=40+r()*560, y=40+r()*320; const hot=r()<.06; g+=`<circle cx="${x}" cy="${y}" r="${hot?9:4}" fill="${hot?box:ink}" opacity="${hot?1:.35}"/>`}
+    g+=`<line x1="40" y1="360" x2="600" y2="60" stroke="${gz}" stroke-width="3" stroke-dasharray="10 8"/>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${g}</svg>`;
+}
+
+/* ---------- Render projects ---------- */
+const grid=document.getElementById("projects");
+PROJECTS.forEach(p=>{
+  const b=document.createElement("button");
+  b.className="proj rv"+(p.wide?" wide":""); b.type="button";
+  b.setAttribute("aria-label",`${p.title}: open project details`);
+  b.innerHTML=`<div class="cover">${cover(p.id)}<div class="bbox"><span>${p.label}</span></div></div>
+    <span class="tag">${p.tag}</span><h3>${p.title}</h3><p>${p.line}</p><div class="venue">${p.venue}</div>`;
+  b.addEventListener("click",()=>openProject(p));
+  grid.appendChild(b);
+});
+
+/* ---------- Dialog ---------- */
+const dlg=document.getElementById("dlg"), sheet=document.getElementById("sheet");
+function openProject(p){
+  sheet.innerHTML=`<button class="close" aria-label="Close project">×</button>
+  <div class="cover">${cover(p.id)}</div>
+  <div class="sheet-body">
+    <div class="tag">${p.tag}</div><h3 id="dlgTitle">${p.title}</h3><p class="sub">${p.line}</p>
+    <div class="facts">${p.facts.map(f=>`<div class="fact"><b>${f[0]}</b><span>${f[1]}</span></div>`).join("")}</div>
+    <div class="sheet-grid">
+      <div><h4>The problem</h4><p>${p.problem}</p></div>
+      <div><h4>What I built</h4><p>${p.approach}</p></div>
+      <div><h4>What it showed</h4><p>${p.result}</p></div>
+      <div><h4>Where it leads</h4><p>${p.next}</p></div>
+    </div>
+    <div class="sheet-links"><span class="badge b-pub">${p.venue}</span>${p.link?`<a class="btn solid" href="${p.link[1]}" target="_blank" rel="noopener">${p.link[0]}</a>`:""}</div>
+  </div>`;
+  sheet.querySelector(".close").onclick=closeProject;
+  dlg.showModal(); requestAnimationFrame(()=>dlg.classList.add("show"));
+}
+function closeProject(){dlg.classList.remove("show"); setTimeout(()=>dlg.close(),280)}
+dlg.addEventListener("click",e=>{if(e.target===dlg)closeProject()});
+dlg.addEventListener("cancel",e=>{e.preventDefault();closeProject()});
+
+/* ---------- Publications ---------- */
+const pubs=document.getElementById("pubs");
+PUBS.forEach(p=>{
+  const li=document.createElement("li"); li.className="pub"; li.dataset.c=p.c;
+  const t=p.url?`<a href="${p.url}" target="_blank" rel="noopener">${p.t}</a>`:p.t;
+  li.innerHTML=`<span class="yr">${p.y}</span><div><div class="t">${t}</div><div class="v">${p.v}</div></div><span class="badge ${BADGE[p.s][1]}">${BADGE[p.s][0]}</span>`;
+  pubs.appendChild(li);
+});
+document.getElementById("filters").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  document.querySelectorAll("#filters button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  const f=b.dataset.f;
+  [...pubs.children].forEach((li,i)=>{
+    const show=f==="all"||li.dataset.c===f;
+    if(show){li.classList.remove("hide"); li.classList.add("fade"); setTimeout(()=>li.classList.remove("fade"),20+i*35)}
+    else li.classList.add("hide");
+  });
+});
+
+/* ---------- Hero patch reveal ---------- */
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+(function(){
+  const stage=document.getElementById("stage"), host=document.getElementById("patches");
+  const cols=window.innerWidth<600?8:14, rows=window.innerWidth<600?4:5;
+  host.style.setProperty("--cols",cols); host.style.setProperty("--rows",rows);
+  const cells=[]; for(let i=0;i<cols*rows;i++){const d=document.createElement("div"); host.appendChild(d); cells.push(d)}
+  if(reduce){host.remove();return}
+  // the "one patch": a seed region about 10% of the grid
+  const seedIdx=new Set(); const sc=Math.floor(cols*0.35), sr=Math.floor(rows/2)-1;
+  const sw=Math.max(2,Math.round(cols*0.18)), sh=2;
+  for(let r=sr;r<sr+sh;r++)for(let c=sc;c<sc+sw;c++)seedIdx.add(r*cols+c);
+  seedIdx.forEach(i=>cells[i].classList.add("gone"));
+  // outline the seed
+  const first=[...seedIdx][0], last=[...seedIdx].pop();
+  const cap=document.createElement("div"); cap.className="patch-caption"; cap.textContent="10% visible";
+  const frame=document.createElement("div"); frame.style.cssText="position:absolute;border:2px solid var(--box);pointer-events:none;transition:all .9s cubic-bezier(.2,.8,.2,1);z-index:3";
+  stage.appendChild(frame); stage.appendChild(cap);
+  function place(){
+    const a=cells[first].getBoundingClientRect(), b=cells[last].getBoundingClientRect(), s=stage.getBoundingClientRect();
+    frame.style.left=(a.left-s.left)+"px"; frame.style.top=(a.top-s.top)+"px";
+    frame.style.width=(b.right-a.left)+"px"; frame.style.height=(b.bottom-a.top)+"px";
+    cap.style.left=(a.left-s.left)+"px"; cap.style.top=(a.top-s.top-22)+"px";
+  }
+  place();
+  const rest=cells.map((c,i)=>i).filter(i=>!seedIdx.has(i)).sort(()=>Math.random()-.5);
+  setTimeout(()=>{
+    cap.textContent="reconstructing";
+    rest.forEach((i,k)=>setTimeout(()=>cells[i].classList.add("gone"),k*22));
+    setTimeout(()=>{
+      const s=stage.getBoundingClientRect(), n=stage.querySelector(".name").getBoundingClientRect();
+      frame.style.left=(n.left-s.left-10)+"px"; frame.style.top=(n.top-s.top-8)+"px";
+      frame.style.width=(n.width+20)+"px"; frame.style.height=(n.height+16)+"px";
+      cap.style.transition="all .9s cubic-bezier(.2,.8,.2,1)";
+      cap.style.left=(n.left-s.left-10)+"px"; cap.style.top=(n.top-s.top-30)+"px";
+      cap.textContent="researcher 0.99";
+    }, rest.length*22+200);
+    setTimeout(()=>{frame.style.opacity="0"; cap.style.opacity="0"; setTimeout(()=>{host.remove();frame.remove();cap.remove()},900)}, rest.length*22+2400);
+  }, 900);
+})();
+
+/* ---------- Scroll reveals ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12, rootMargin:"0px 0px -40px 0px"});
+document.querySelectorAll(".rv").forEach((el,i)=>{el.style.transitionDelay=(i%4)*70+"ms"; io.observe(el)});
+
+/* ---------- Counters ---------- */
+const co=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return; co.unobserve(e.target);
+  const el=e.target, end=parseFloat(el.dataset.count), dec=+el.dataset.dec||0, suf=el.dataset.suffix||"";
+  const fmt=v=>dec?v.toFixed(dec):Math.round(v).toLocaleString("en-US");
+  if(reduce){el.textContent=fmt(end)+suf;return}
+  const t0=performance.now(), dur=1500;
+  (function tick(t){const k=Math.min(1,(t-t0)/dur), ease=1-Math.pow(1-k,3); el.textContent=fmt(end*ease)+suf; if(k<1)requestAnimationFrame(tick)})(t0);
+}),{threshold:.6});
+document.querySelectorAll("[data-count]").forEach(el=>co.observe(el));
+
+/* ---------- Active nav pill ---------- */
+const links=[...document.querySelectorAll("#nav a")], pill=document.getElementById("pill");
+function setActive(id){
+  links.forEach(a=>{const on=a.getAttribute("href")==="#"+id; a.classList.toggle("active",on); if(on){pill.style.transform=`translateY(${a.offsetTop}px)`; pill.style.height=a.offsetHeight+"px"}});
+}
+const ids=["home","research","about","work","publications","experience","recognition","contact"];
+const map={about:"research",recognition:"experience"};
+const so=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)setActive(map[e.target.id]||e.target.id)}),{rootMargin:"-45% 0px -50% 0px"});
+ids.forEach(id=>{const el=document.getElementById(id); if(el)so.observe(el)});
+setActive("home");
+
+/* ---------- Timeline fill ---------- */
+const tl=document.getElementById("timeline"), fill=document.getElementById("tlfill");
+function tlUpdate(){const r=tl.getBoundingClientRect(); const p=Math.min(1,Math.max(0,(innerHeight*.7-r.top)/r.height)); fill.style.height=(p*(r.height-16))+"px"}
+addEventListener("scroll",tlUpdate,{passive:true}); tlUpdate();
+
+/* ---------- Mobile menu ---------- */
+const drawer=document.getElementById("drawer"), ob=document.getElementById("openMenu");
+ob.onclick=()=>{drawer.classList.add("open"); ob.setAttribute("aria-expanded","true")};
+const shut=()=>{drawer.classList.remove("open"); ob.setAttribute("aria-expanded","false")};
+document.getElementById("closeMenu").onclick=shut;
+drawer.querySelectorAll("a").forEach(a=>a.addEventListener("click",shut));
+
+/* ---------- Contact form → email draft ---------- */
+document.getElementById("form").addEventListener("submit",e=>{
+  e.preventDefault(); const f=e.target, note=document.getElementById("note");
+  if(!f.name.value.trim()||!f.email.value.trim()||!f.msg.value.trim()){note.textContent="Add your name, email, and a message to continue.";return}
+  const subject=`${f.topic.value} — from ${f.name.value}`;
+  const body=`${f.msg.value}\n\n${f.name.value}\n${f.email.value}`;
+  const a=document.createElement("a"); a.href=`mailto:spenchala@crimson.ua.edu?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; a.target="_top"; a.click();
+  note.textContent="Email draft opened. If nothing appeared, write to spenchala@crimson.ua.edu.";
+});
+</script>
+</body>
+</html>
